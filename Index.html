@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 서울국제정원박람회 프로그램 설문조사</title>
+  <style>
+    :root {
+      --green-dark:  #2d6a4f;
+      --green-main:  #40916c;
+      --green-light: #74c69d;
+      --green-pale:  #d8f3dc;
+      --gray:        #6b7280;
+      --bg:          #f0faf4;
+      --white:       #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* ── 헤더 ── */
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-main) 100%);
+      color: var(--white);
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+    header .sub { font-size: 13px; letter-spacing: 2px; opacity: .8; margin-bottom: 8px; }
+    header h1  { font-size: clamp(20px, 4vw, 28px); font-weight: 700; line-height: 1.4; }
+    header p   { margin-top: 10px; font-size: 14px; opacity: .85; line-height: 1.6; }
+
+    /* ── 안내 배너 ── */
+    .notice {
+      background: #fff8e1;
+      border-left: 4px solid #f59e0b;
+      margin: 20px 20px 0;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #78350f;
+    }
+    .notice > strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    /* ── 카테고리 버튼 ── */
+    .category-section { padding: 28px 20px 20px; }
+    .category-section h2 {
+      font-size: 15px; color: var(--gray);
+      margin-bottom: 14px; text-align: center; letter-spacing: 1px;
+    }
+    .category-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; max-width: 800px; margin: 0 auto;
+    }
+    .cat-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 18px 12px; border: none; border-radius: 16px; cursor: pointer;
+      font-size: 14px; font-weight: 700; color: var(--white);
+      transition: transform .2s, box-shadow .2s, filter .2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    }
+    .cat-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+
+    /* 선택됨: 원색 유지 + 살짝 위로 */
+    .cat-btn.active {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.3);
+    }
+    /* 미선택: 색감 35%만 */
+    .cat-btn.dimmed {
+      filter: saturate(0.35);
+    }
+
+    .cat-btn .icon  { font-size: 28px; }
+    .cat-btn .count {
+      font-size: 11px; font-weight: 400;
+      background: rgba(255,255,255,.25);
+      border-radius: 20px; padding: 2px 8px;
+    }
+
+    .btn-tour        { background: linear-gradient(135deg, #3a86ff, #2563eb); }
+    .btn-market      { background: linear-gradient(135deg, #fb8500, #d97706); }
+    .btn-experience  { background: linear-gradient(135deg, #8338ec, #6d28d9); }
+    .btn-ecology     { background: linear-gradient(135deg, #2dc653, #16a34a); }
+    .btn-performance { background: linear-gradient(135deg, #e63946, #b91c1c); }
+
+    /* ── 전체보기 버튼 ── */
+    .show-all-wrap { text-align: center; margin-top: 12px; }
+    .show-all-btn {
+      background: none; border: 2px solid var(--green-main);
+      color: var(--green-dark); font-size: 13px; font-weight: 600;
+      padding: 8px 22px; border-radius: 20px; cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .show-all-btn:hover { background: var(--green-main); color: #fff; }
+
+    /* ── 검색 ── */
+    .search-wrap { max-width: 700px; margin: 0 auto; padding: 0 20px 16px; }
+    .search-wrap input {
+      width: 100%; padding: 12px 18px;
+      border: 2px solid #d1fae5; border-radius: 30px;
+      font-size: 15px; outline: none; background: #fff;
+      transition: border-color .2s;
+    }
+    .search-wrap input:focus { border-color: var(--green-main); }
+
+    /* ── 프로그램 목록 ── */
+    .list-section { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
+    .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .list-header h3 { font-size: 16px; color: var(--green-dark); }
+    .list-header .result-count { font-size: 13px; color: var(--gray); }
+
+    .category-group-title {
+      display: flex; align-items: center; gap: 10px;
+      margin: 24px 0 12px; font-size: 15px; font-weight: 700;
+    }
+    .category-group-title .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+    .program-card {
+      background: var(--white); border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      transition: box-shadow .15s, transform .15s;
+      cursor: pointer;
+    }
+    .program-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.1); transform: translateY(-2px); }
+    .program-card.hidden { display: none; }
+
+    .card-num {
+      font-size: 13px; font-weight: 700; color: #fff;
+      border-radius: 50%; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .program-card[data-cat="해설투어형"] .card-num { background: #3a86ff; }
+    .program-card[data-cat="행사마켓형"] .card-num { background: #fb8500; }
+    .program-card[data-cat="체험교육형"] .card-num { background: #8338ec; }
+    .program-card[data-cat="생태교육형"] .card-num { background: #2dc653; }
+    .program-card[data-cat="공연전시형"] .card-num { background: #e63946; }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.4; }
+    .card-meta { font-size: 12px; color: var(--gray); display: flex; flex-wrap: wrap; gap: 8px; }
+    .card-meta span { display: flex; align-items: center; gap: 3px; }
+
+    .card-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    .tag-tour        { background: #dbeafe; color: #1d4ed8; }
+    .tag-market      { background: #ffedd5; color: #c2410c; }
+    .tag-experience  { background: #ede9fe; color: #6d28d9; }
+    .tag-ecology     { background: #dcfce7; color: #15803d; }
+    .tag-performance { background: #fee2e2; color: #b91c1c; }
+
+    .card-arrow { font-size: 18px; color: var(--green-light); flex-shrink: 0; }
+
+    /* ── 모달 ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 1000;
+      justify-content: center; align-items: flex-end;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 600px; max-height: 80vh;
+      overflow-y: auto; padding: 28px 24px 40px;
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 40px; height: 4px; background: #e5e7eb; border-radius: 2px; margin: 0 auto 20px; }
+    .modal h2 { font-size: 18px; color: var(--green-dark); margin-bottom: 6px; }
+    .modal .modal-sub { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+    .modal-info { background: var(--green-pale); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.7; }
+    .survey-link-btn {
+      display: block; width: 100%; padding: 16px;
+      color: #fff; font-size: 16px; font-weight: 700;
+      border: none; border-radius: 14px; cursor: pointer;
+      text-align: center; margin-bottom: 12px; text-decoration: none;
+      transition: opacity .15s;
+    }
+    .survey-link-btn:hover { opacity: .9; }
+    .modal-cancel {
+      display: block; width: 100%; padding: 12px;
+      background: none; border: 2px solid #e5e7eb;
+      border-radius: 14px; font-size: 14px; color: var(--gray); cursor: pointer;
+    }
+    .modal-cancel:hover { background: #f9fafb; }
+
+    .no-result { text-align: center; padding: 40px; color: var(--gray); font-size: 15px; display: none; }
+
+    @media (max-width: 480px) {
+      .category-buttons { grid-template-columns: repeat(2, 1fr); }
+      .cat-btn:last-child { grid-column: 1 / -1; }
+      .card-name { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="sub">2026 서울국제정원박람회</div>
+  <h1>프로그램 만족도 설문조사</h1>
+  <p>참여하신 프로그램을 선택하시면 해당 설문으로 바로 이동합니다.</p>
+</header>
+
+<div class="notice">
+  <strong>📋 설문 참여 방법</strong>아래에서 ① 참여하신 프로그램 카테고리 버튼을 누르거나, ② 프로그램명을 직접 찾아 클릭하세요.<br>설문은 약 3~5분 소요되며, 소중한 의견은 더 나은 프로그램 운영에 활용됩니다.
+</div>
+
+<section class="category-section">
+  <h2>▼ 참여하신 프로그램 카테고리를 선택하세요</h2>
+  <div class="category-buttons">
+    <button class="cat-btn btn-tour"        data-cat="해설투어형" onclick="filterCategory('해설투어형')">
+      <span class="icon">🗺️</span>해설투어형<span class="count">6개 프로그램</span>
+    </button>
+    <button class="cat-btn btn-market"      data-cat="행사마켓형" onclick="filterCategory('행사마켓형')">
+      <span class="icon">🎪</span>행사마켓형<span class="count">10개 프로그램</span>
+    </button>
+    <button class="cat-btn btn-experience"  data-cat="체험교육형" onclick="filterCategory('체험교육형')">
+      <span class="icon">🌱</span>체험교육형<span class="count">15개 프로그램</span>
+    </button>
+    <button class="cat-btn btn-ecology"     data-cat="생태교육형" onclick="filterCategory('생태교육형')">
+      <span class="icon">🦋</span>생태교육형<span class="count">11개 프로그램</span>
+    </button>
+    <button class="cat-btn btn-performance" data-cat="공연전시형" onclick="filterCategory('공연전시형')">
+      <span class="icon">🎭</span>공연전시형<span class="count">11개 프로그램</span>
+    </button>
+  </div>
+  <div class="show-all-wrap">
+    <button class="show-all-btn" onclick="showAll()">전체 프로그램 보기</button>
+  </div>
+</section>
+
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="🔍  프로그램명 검색..." oninput="searchPrograms()" />
+</div>
+
+<section class="list-section">
+  <div class="list-header">
+    <h3 id="listTitle">전체 프로그램 (53개)</h3>
+    <span class="result-count" id="resultCount">53개 표시중</span>
+  </div>
+
+  <div id="programList">
+
+            <!-- ═══ A. 해설투어형 ═══ -->
+    <div class="category-group-title" data-cat="해설투어형">
+      <span class="dot" style="background:#3a86ff"></span>🗺️ A. 해설투어형
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="1" onclick="openModal(1)">
+      <div class="card-num">1</div>
+      <div class="card-body"><div class="card-name">스마트 도슨트</div>
+      <div class="card-meta"><span>📍 서울숲 일대</span><span>📅 상시</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="2" onclick="openModal(2)">
+      <div class="card-num">2</div>
+      <div class="card-body"><div class="card-name">정원도슨트 (국영문)</div>
+      <div class="card-meta"><span>📍 종합안내소</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="3" onclick="openModal(3)">
+      <div class="card-num">3</div>
+      <div class="card-body"><div class="card-name">정원 동행 투어 (장애인)</div>
+      <div class="card-meta"><span>📍 종합안내소</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="4" onclick="openModal(4)">
+      <div class="card-num">4</div>
+      <div class="card-body"><div class="card-name">정원 동행 투어 (다문화가정)</div>
+      <div class="card-meta"><span>📍 종합안내소</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="5" onclick="openModal(5)">
+      <div class="card-num">5</div>
+      <div class="card-body"><div class="card-name">테마가 있는 정원여행</div>
+      <div class="card-meta"><span>📍 서울숲</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="해설투어형" data-num="6" onclick="openModal(6)">
+      <div class="card-num">6</div>
+      <div class="card-body"><div class="card-name">서울숲 가을 &lt;정원 깊이 읽기&gt;</div>
+      <div class="card-meta"><span>📍 서울숲 정원 일부</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-tour">해설투어형</span><span class="card-arrow">›</span>
+    </div>
+
+    <!-- ═══ B. 행사마켓형 ═══ -->
+    <div class="category-group-title" data-cat="행사마켓형">
+      <span class="dot" style="background:#fb8500"></span>🎪 B. 행사마켓형
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="7" onclick="openModal(7)">
+      <div class="card-num">7</div>
+      <div class="card-body"><div class="card-name">힙독클럽 노마드리딩</div>
+      <div class="card-meta"><span>📍 테마정원, 잔디공간</span><span>📅 05.16 / 10.24</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="8" onclick="openModal(8)">
+      <div class="card-num">8</div>
+      <div class="card-body"><div class="card-name">필름성수 &lt;제7회 다양성洞 영화제&gt;</div>
+      <div class="card-meta"><span>📍 메인무대 (야외무대)</span><span>📅 10.11</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="9" onclick="openModal(9)">
+      <div class="card-num">9</div>
+      <div class="card-body"><div class="card-name">크래프트 성수 (크리성수)</div>
+      <div class="card-meta"><span>📍 잔디마당 (가족마당)</span><span>📅 10.09~10.11</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="10" onclick="openModal(10)">
+      <div class="card-num">10</div>
+      <div class="card-body"><div class="card-name">농부마켓 (마르쉐)</div>
+      <div class="card-meta"><span>📍 잔디마당 (가족마당)</span><span>📅 05월~10월, 매월 첫째주 토요일</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="11" onclick="openModal(11)">
+      <div class="card-num">11</div>
+      <div class="card-body"><div class="card-name">포레스트 가든런</div>
+      <div class="card-meta"><span>📍 서울숲 정원 일대</span><span>📅 09.13 / 09.20 / 10.11 / 10.18</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="12" onclick="openModal(12)">
+      <div class="card-num">12</div>
+      <div class="card-body"><div class="card-name">더리딩챌린지</div>
+      <div class="card-meta"><span>📍 무장애쉼터</span><span>📅 09.19</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="13" onclick="openModal(13)">
+      <div class="card-num">13</div>
+      <div class="card-body"><div class="card-name">청년동아리ON</div>
+      <div class="card-meta"><span>📍 메인무대 (야외무대)</span><span>📅 09.05</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="14" onclick="openModal(14)">
+      <div class="card-num">14</div>
+      <div class="card-body"><div class="card-name">도시농업박람회</div>
+      <div class="card-meta"><span>📍 메인무대 (야외무대) 일대</span><span>📅 10.16~10.17</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="15" onclick="openModal(15)">
+      <div class="card-num">15</div>
+      <div class="card-body"><div class="card-name">&lt;서울 청년 가족 건강음식&gt; 캠페인</div>
+      <div class="card-meta"><span>📍 잔디마당 (가족마당)</span><span>📅 10.24</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="행사마켓형" data-num="16" onclick="openModal(16)">
+      <div class="card-num">16</div>
+      <div class="card-body"><div class="card-name">성수메이드 &lt;성동예술정원&gt;</div>
+      <div class="card-meta"><span>📍 서울숲3번 출입구</span><span>📅 10.09~10.11</span></div></div>
+      <span class="card-tag tag-market">행사마켓형</span><span class="card-arrow">›</span>
+    </div>
+
+    <!-- ═══ C. 체험교육형 ═══ -->
+    <div class="category-group-title" data-cat="체험교육형">
+      <span class="dot" style="background:#8338ec"></span>🌱 C. 체험교육형
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="17" onclick="openModal(17)">
+      <div class="card-num">17</div>
+      <div class="card-body"><div class="card-name">서울숲을 여행하는 돌</div>
+      <div class="card-meta"><span>📍 가든라운지</span><span>📅 상시</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="18" onclick="openModal(18)">
+      <div class="card-num">18</div>
+      <div class="card-body"><div class="card-name">스마트 보물찾기 &lt;가든 헌터스&gt;</div>
+      <div class="card-meta"><span>📍 서울숲 및 성수동 일대</span><span>📅 상시</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="19" onclick="openModal(19)">
+      <div class="card-num">19</div>
+      <div class="card-body"><div class="card-name">정원 &lt;비밀엽서&gt;</div>
+      <div class="card-meta"><span>📍 서울숲 일대</span><span>📅 07월~10월, 매주 토/일요일</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="20" onclick="openModal(20)">
+      <div class="card-num">20</div>
+      <div class="card-body"><div class="card-name">도심 승마체험</div>
+      <div class="card-meta"><span>📍 체험마당</span><span>📅 10.09~10.10</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="21" onclick="openModal(21)">
+      <div class="card-num">21</div>
+      <div class="card-body"><div class="card-name">명화로 만나는 서울숲</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원</span><span>📅 09.02 / 10.14</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="22" onclick="openModal(22)">
+      <div class="card-num">22</div>
+      <div class="card-body"><div class="card-name">매력텃밭정원</div>
+      <div class="card-meta"><span>📍 생태학습장</span><span>📅 05월~10월, 매주 금/토</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="23" onclick="openModal(23)">
+      <div class="card-num">23</div>
+      <div class="card-body"><div class="card-name">힐링 서울숲 정원체험 (원예교실 등)</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원 주변 실습정원 등</span><span>📅 03월~11월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="24" onclick="openModal(24)">
+      <div class="card-num">24</div>
+      <div class="card-body"><div class="card-name">유아숲체험원</div>
+      <div class="card-meta"><span>📍 유아숲체험원 (기둥정원 근처무대)</span><span>📅 03월~11월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="25" onclick="openModal(25)">
+      <div class="card-num">25</div>
+      <div class="card-body"><div class="card-name">서울숲 해설 (어울림 숲길 등)</div>
+      <div class="card-meta"><span>📍 체험학습원 일대</span><span>📅 03월~11월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="26" onclick="openModal(26)">
+      <div class="card-num">26</div>
+      <div class="card-body"><div class="card-name">서울숲, 에코라이프</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원</span><span>📅 04월~12월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="27" onclick="openModal(27)">
+      <div class="card-num">27</div>
+      <div class="card-body"><div class="card-name">서울 가드닝 크루</div>
+      <div class="card-meta"><span>📍 미정</span><span>📅 05월~09월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="28" onclick="openModal(28)">
+      <div class="card-num">28</div>
+      <div class="card-body"><div class="card-name">국정박사운드위크</div>
+      <div class="card-meta"><span>📍 기둥정원</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="29" onclick="openModal(29)">
+      <div class="card-num">29</div>
+      <div class="card-body"><div class="card-name">서울숲 휴휴산방</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="30" onclick="openModal(30)">
+      <div class="card-num">30</div>
+      <div class="card-body"><div class="card-name">서울숲 &lt;그린플로깅&gt;</div>
+      <div class="card-meta"><span>📍 서울숲 일대</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="체험교육형" data-num="31" onclick="openModal(31)">
+      <div class="card-num">31</div>
+      <div class="card-body"><div class="card-name">별빛따라 서울숲 탐험</div>
+      <div class="card-meta"><span>📍 침엽수마당 (집결지)</span><span>📅 09월</span></div></div>
+      <span class="card-tag tag-experience">체험교육형</span><span class="card-arrow">›</span>
+    </div>
+
+    <!-- ═══ D. 생태교육형 ═══ -->
+    <div class="category-group-title" data-cat="생태교육형">
+      <span class="dot" style="background:#2dc653"></span>🦋 D. 생태교육형
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="32" onclick="openModal(32)">
+      <div class="card-num">32</div>
+      <div class="card-body"><div class="card-name">아름다운 서울숲의 나비 (주말)</div>
+      <div class="card-meta"><span>📍 곤충 식물원</span><span>📅 05월, 06월, 09월 매주 토요일</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="33" onclick="openModal(33)">
+      <div class="card-num">33</div>
+      <div class="card-body"><div class="card-name">아름다운 서울숲의 나비 (평일)</div>
+      <div class="card-meta"><span>📍 곤충 식물원</span><span>📅 05월, 06월, 09월 매주 화/목요일</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="34" onclick="openModal(34)">
+      <div class="card-num">34</div>
+      <div class="card-body"><div class="card-name">생물다양성탐사대 (단체)</div>
+      <div class="card-meta"><span>📍 체험학습원 일대</span><span>📅 03월~11월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="35" onclick="openModal(35)">
+      <div class="card-num">35</div>
+      <div class="card-body"><div class="card-name">신기한 생물교실</div>
+      <div class="card-meta"><span>📍 생태학습장</span><span>📅 03월~12월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="36" onclick="openModal(36)">
+      <div class="card-num">36</div>
+      <div class="card-body"><div class="card-name">공원생물탐사대</div>
+      <div class="card-meta"><span>📍 체험학습원 일대</span><span>📅 03월~12월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="37" onclick="openModal(37)">
+      <div class="card-num">37</div>
+      <div class="card-body"><div class="card-name">사육사가 들려주는 꽃사슴 이야기</div>
+      <div class="card-meta"><span>📍 생태숲</span><span>📅 04월~06월 / 09월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="38" onclick="openModal(38)">
+      <div class="card-num">38</div>
+      <div class="card-body"><div class="card-name">안녕하세요 두시의 데이트 꽃사슴입니다</div>
+      <div class="card-meta"><span>📍 생태숲</span><span>📅 04월~06월 / 09월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="39" onclick="openModal(39)">
+      <div class="card-num">39</div>
+      <div class="card-body"><div class="card-name">벼 한톨의 모험! 모내기 체험교실</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원 논습지</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="40" onclick="openModal(40)">
+      <div class="card-num">40</div>
+      <div class="card-body"><div class="card-name">재미있는 곤충이야기</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="41" onclick="openModal(41)">
+      <div class="card-num">41</div>
+      <div class="card-body"><div class="card-name">가을밤 풀벌레의 오케스트라</div>
+      <div class="card-meta"><span>📍 생태학습장, 습지생태원</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="생태교육형" data-num="42" onclick="openModal(42)">
+      <div class="card-num">42</div>
+      <div class="card-body"><div class="card-name">비밀의 숲</div>
+      <div class="card-meta"><span>📍 생태숲</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-ecology">생태교육형</span><span class="card-arrow">›</span>
+    </div>
+
+    <!-- ═══ E. 공연전시형 ═══ -->
+    <div class="category-group-title" data-cat="공연전시형">
+      <span class="dot" style="background:#e63946"></span>🎭 E. 공연전시형
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="43" onclick="openModal(43)">
+      <div class="card-num">43</div>
+      <div class="card-body"><div class="card-name">제5회 서울특별시 조경상</div>
+      <div class="card-meta"><span>📍 서울숲 커뮤니티센터</span><span>📅 09.08~09.19</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="44" onclick="openModal(44)">
+      <div class="card-num">44</div>
+      <div class="card-body"><div class="card-name">조각도시 서울</div>
+      <div class="card-meta"><span>📍 서울숲 일대</span><span>📅 01월~12월</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="45" onclick="openModal(45)">
+      <div class="card-num">45</div>
+      <div class="card-body"><div class="card-name">서울거리공연 &lt;구석구석라이브&gt;</div>
+      <div class="card-meta"><span>📍 서울숲, 매헌시민숲, 한강버스 선착장 등</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="46" onclick="openModal(46)">
+      <div class="card-num">46</div>
+      <div class="card-body"><div class="card-name">공원사진사 작품전시</div>
+      <div class="card-meta"><span>📍 체육공원 맞은편</span><span>📅 05월~10월</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="47" onclick="openModal(47)">
+      <div class="card-num">47</div>
+      <div class="card-body"><div class="card-name">아트 성수 &lt;LG아트포유&gt;</div>
+      <div class="card-meta"><span>📍 거울연못</span><span>📅 10.02~10.11</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="48" onclick="openModal(48)">
+      <div class="card-num">48</div>
+      <div class="card-body"><div class="card-name">전통정원 소리마당</div>
+      <div class="card-meta"><span>📍 K-헤리티지정원</span><span>📅 09.11~10.24</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="49" onclick="openModal(49)">
+      <div class="card-num">49</div>
+      <div class="card-body"><div class="card-name">&lt;서울숲 팝업스테이지&gt; 가을 버스킹 공연</div>
+      <div class="card-meta"><span>📍 멍가든, 농심정원, 삼표정원</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="50" onclick="openModal(50)">
+      <div class="card-num">50</div>
+      <div class="card-body"><div class="card-name">서울스테이지 in 어텀페스타</div>
+      <div class="card-meta"><span>📍 메인무대 (야외무대)</span><span>📅 09.18 / 09.19 / 09.20</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="51" onclick="openModal(51)">
+      <div class="card-num">51</div>
+      <div class="card-body"><div class="card-name">가을밤 &lt;정원극장&gt;</div>
+      <div class="card-meta"><span>📍 잔디마당 (가족마당)</span><span>📅 09월~10월</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="52" onclick="openModal(52)">
+      <div class="card-num">52</div>
+      <div class="card-body"><div class="card-name">고밍아웃콘서트</div>
+      <div class="card-meta"><span>📍 메인무대 (야외무대)</span><span>📅 10.09</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+    <div class="program-card" data-cat="공연전시형" data-num="53" onclick="openModal(53)">
+      <div class="card-num">53</div>
+      <div class="card-body"><div class="card-name">산불피해목 의자전시</div>
+      <div class="card-meta"><span>📍 은행나무숲</span><span>📅 06.27~10.27</span></div></div>
+      <span class="card-tag tag-performance">공연전시형</span><span class="card-arrow">›</span>
+    </div>
+</div>
+  <div class="no-result" id="noResult">검색 결과가 없습니다.</div>
+</section>
+
+<!-- ── 모달 ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="modalTitle"></h2>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-info" id="modalInfo"></div>
+    <a class="survey-link-btn" id="surveyBtn" href="#" target="_blank">📝 설문조사 참여하기</a>
+    <button class="modal-cancel" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<script>
+  const programs = {
+    1: { name:'스마트 도슨트', cat:'해설투어형', place:'서울숲 일대', period:'상시' },
+    2: { name:'정원도슨트 (국영문)', cat:'해설투어형', place:'종합안내소', period:'05월~10월' },
+    3: { name:'정원 동행 투어 (장애인)', cat:'해설투어형', place:'종합안내소', period:'05월~10월' },
+    4: { name:'정원 동행 투어 (다문화가정)', cat:'해설투어형', place:'종합안내소', period:'05월~10월' },
+    5: { name:'테마가 있는 정원여행', cat:'해설투어형', place:'서울숲', period:'09월~10월' },
+    6: { name:'서울숲 가을 <정원 깊이 읽기>', cat:'해설투어형', place:'서울숲 정원 일부', period:'09월~10월' },
+    7: { name:'힙독클럽 노마드리딩', cat:'행사마켓형', place:'테마정원, 잔디공간', period:'05.16 / 10.24' },
+    8: { name:'필름성수 <제7회 다양성洞 영화제>', cat:'행사마켓형', place:'메인무대 (야외무대)', period:'10.11' },
+    9: { name:'크래프트 성수 (크리성수)', cat:'행사마켓형', place:'잔디마당 (가족마당)', period:'10.09~10.11' },
+    10: { name:'농부마켓 (마르쉐)', cat:'행사마켓형', place:'잔디마당 (가족마당)', period:'05월~10월, 매월 첫째주 토요일' },
+    11: { name:'포레스트 가든런', cat:'행사마켓형', place:'서울숲 정원 일대', period:'09.13 / 09.20 / 10.11 / 10.18' },
+    12: { name:'더리딩챌린지', cat:'행사마켓형', place:'무장애쉼터', period:'09.19' },
+    13: { name:'청년동아리ON', cat:'행사마켓형', place:'메인무대 (야외무대)', period:'09.05' },
+    14: { name:'도시농업박람회', cat:'행사마켓형', place:'메인무대 (야외무대) 일대', period:'10.16~10.17' },
+    15: { name:'<서울 청년 가족 건강음식> 캠페인', cat:'행사마켓형', place:'잔디마당 (가족마당)', period:'10.24' },
+    16: { name:'성수메이드 <성동예술정원>', cat:'행사마켓형', place:'서울숲3번 출입구', period:'10.09~10.11' },
+    17: { name:'서울숲을 여행하는 돌', cat:'체험교육형', place:'가든라운지', period:'상시' },
+    18: { name:'스마트 보물찾기 <가든 헌터스>', cat:'체험교육형', place:'서울숲 및 성수동 일대', period:'상시' },
+    19: { name:'정원 <비밀엽서>', cat:'체험교육형', place:'서울숲 일대', period:'07월~10월, 매주 토/일요일' },
+    20: { name:'도심 승마체험', cat:'체험교육형', place:'체험마당', period:'10.09~10.10' },
+    21: { name:'명화로 만나는 서울숲', cat:'체험교육형', place:'생태학습장, 습지생태원', period:'09.02 / 10.14' },
+    22: { name:'매력텃밭정원', cat:'체험교육형', place:'생태학습장', period:'05월~10월, 매주 금/토' },
+    23: { name:'힐링 서울숲 정원체험 (원예교실 등)', cat:'체험교육형', place:'생태학습장, 습지생태원 주변 실습정원 등', period:'03월~11월' },
+    24: { name:'유아숲체험원', cat:'체험교육형', place:'유아숲체험원 (기둥정원 근처무대)', period:'03월~11월' },
+    25: { name:'서울숲 해설 (어울림 숲길 등)', cat:'체험교육형', place:'체험학습원 일대', period:'03월~11월' },
+    26: { name:'서울숲, 에코라이프', cat:'체험교육형', place:'생태학습장, 습지생태원', period:'04월~12월' },
+    27: { name:'서울 가드닝 크루', cat:'체험교육형', place:'미정', period:'05월~09월' },
+    28: { name:'국정박사운드위크', cat:'체험교육형', place:'기둥정원', period:'05월~10월' },
+    29: { name:'서울숲 휴휴산방', cat:'체험교육형', place:'생태학습장, 습지생태원', period:'05월~10월' },
+    30: { name:'서울숲 <그린플로깅>', cat:'체험교육형', place:'서울숲 일대', period:'09월~10월' },
+    31: { name:'별빛따라 서울숲 탐험', cat:'체험교육형', place:'침엽수마당 (집결지)', period:'09월' },
+    32: { name:'아름다운 서울숲의 나비 (주말)', cat:'생태교육형', place:'곤충 식물원', period:'05월, 06월, 09월 매주 토요일' },
+    33: { name:'아름다운 서울숲의 나비 (평일)', cat:'생태교육형', place:'곤충 식물원', period:'05월, 06월, 09월 매주 화/목요일' },
+    34: { name:'생물다양성탐사대 (단체)', cat:'생태교육형', place:'체험학습원 일대', period:'03월~11월' },
+    35: { name:'신기한 생물교실', cat:'생태교육형', place:'생태학습장', period:'03월~12월' },
+    36: { name:'공원생물탐사대', cat:'생태교육형', place:'체험학습원 일대', period:'03월~12월' },
+    37: { name:'사육사가 들려주는 꽃사슴 이야기', cat:'생태교육형', place:'생태숲', period:'04월~06월 / 09월~10월' },
+    38: { name:'안녕하세요 두시의 데이트 꽃사슴입니다', cat:'생태교육형', place:'생태숲', period:'04월~06월 / 09월~10월' },
+    39: { name:'벼 한톨의 모험! 모내기 체험교실', cat:'생태교육형', place:'생태학습장, 습지생태원 논습지', period:'05월~10월' },
+    40: { name:'재미있는 곤충이야기', cat:'생태교육형', place:'생태학습장, 습지생태원', period:'09월~10월' },
+    41: { name:'가을밤 풀벌레의 오케스트라', cat:'생태교육형', place:'생태학습장, 습지생태원', period:'09월~10월' },
+    42: { name:'비밀의 숲', cat:'생태교육형', place:'생태숲', period:'05월~10월' },
+    43: { name:'제5회 서울특별시 조경상', cat:'공연전시형', place:'서울숲 커뮤니티센터', period:'09.08~09.19' },
+    44: { name:'조각도시 서울', cat:'공연전시형', place:'서울숲 일대', period:'01월~12월' },
+    45: { name:'서울거리공연 <구석구석라이브>', cat:'공연전시형', place:'서울숲, 매헌시민숲, 한강버스 선착장 등', period:'05월~10월' },
+    46: { name:'공원사진사 작품전시', cat:'공연전시형', place:'체육공원 맞은편', period:'05월~10월' },
+    47: { name:'아트 성수 <LG아트포유>', cat:'공연전시형', place:'거울연못', period:'10.02~10.11' },
+    48: { name:'전통정원 소리마당', cat:'공연전시형', place:'K-헤리티지정원', period:'09.11~10.24' },
+    49: { name:'<서울숲 팝업스테이지> 가을 버스킹 공연', cat:'공연전시형', place:'멍가든, 농심정원, 삼표정원', period:'09월~10월' },
+    50: { name:'서울스테이지 in 어텀페스타', cat:'공연전시형', place:'메인무대 (야외무대)', period:'09.18 / 09.19 / 09.20' },
+    51: { name:'가을밤 <정원극장>', cat:'공연전시형', place:'잔디마당 (가족마당)', period:'09월~10월' },
+    52: { name:'고밍아웃콘서트', cat:'공연전시형', place:'메인무대 (야외무대)', period:'10.09' },
+    53: { name:'산불피해목 의자전시', cat:'공연전시형', place:'은행나무숲', period:'06.27~10.27' },
+  };
+
+  const surveyUrls = {
+    '해설투어형': 'https://forms.gle/DQbVifJe2BkND8jNA',
+    '행사마켓형': 'https://forms.gle/zhbd99RCSuyYmify9',
+    '체험교육형': 'https://forms.gle/bw8VxAFeEb2utdNC9',
+    '생태교육형': 'https://forms.gle/7uAXGEaY4ynxn7qZ6',
+    '공연전시형': 'https://forms.gle/X9uuccHBnVJhzBQN9',
+  };
+
+  let currentCat = '전체';
+
+  function filterCategory(cat) {
+    currentCat = cat;
+    document.getElementById('searchInput').value = '';
+
+    const cards  = document.querySelectorAll('.program-card');
+    const groups = document.querySelectorAll('.category-group-title');
+    const btns   = document.querySelectorAll('.cat-btn');
+
+    btns.forEach(b => {
+      b.classList.remove('active', 'dimmed');
+      if (b.dataset.cat === cat) b.classList.add('active');
+      else                       b.classList.add('dimmed');
+    });
+
+    let visible = 0;
+    cards.forEach(card => {
+      const show = card.dataset.cat === cat;
+      card.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    groups.forEach(g => {
+      g.style.display = g.dataset.cat === cat ? 'flex' : 'none';
+    });
+
+    document.getElementById('listTitle').textContent  = `${cat} 프로그램`;
+    document.getElementById('resultCount').textContent = `${visible}개 표시중`;
+    document.getElementById('noResult').style.display  = visible === 0 ? 'block' : 'none';
+  }
+
+  function showAll() {
+    currentCat = '전체';
+    document.getElementById('searchInput').value = '';
+
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active', 'dimmed'));
+    document.querySelectorAll('.program-card').forEach(c => c.classList.remove('hidden'));
+    document.querySelectorAll('.category-group-title').forEach(g => g.style.display = 'flex');
+
+    document.getElementById('listTitle').textContent  = '전체 프로그램 (53개)';
+    document.getElementById('resultCount').textContent = '53개 표시중';
+    document.getElementById('noResult').style.display  = 'none';
+  }
+
+  function searchPrograms() {
+    const q      = document.getElementById('searchInput').value.trim().toLowerCase();
+    const cards  = document.querySelectorAll('.program-card');
+    const groups = document.querySelectorAll('.category-group-title');
+    const btns   = document.querySelectorAll('.cat-btn');
+
+    if (q) {
+      btns.forEach(b => b.classList.remove('active', 'dimmed'));
+      currentCat = '전체';
+    }
+
+    const visibleCats = new Set();
+    let visible = 0;
+    cards.forEach(card => {
+      const name  = card.querySelector('.card-name').textContent.toLowerCase();
+      const catOk = currentCat === '전체' || card.dataset.cat === currentCat;
+      const show  = catOk && (q === '' || name.includes(q));
+      card.classList.toggle('hidden', !show);
+      if (show) { visible++; visibleCats.add(card.dataset.cat); }
+    });
+    groups.forEach(g => {
+      g.style.display = visibleCats.has(g.dataset.cat) ? 'flex' : 'none';
+    });
+
+    document.getElementById('resultCount').textContent = `${visible}개 표시중`;
+    document.getElementById('noResult').style.display  = visible === 0 ? 'block' : 'none';
+  }
+
+  function openModal(num) {
+    const p = programs[num];
+    const catColors = {
+      '해설투어형':'#3a86ff', '행사마켓형':'#fb8500',
+      '체험교육형':'#8338ec', '생태교육형':'#2dc653', '공연전시형':'#e63946'
+    };
+    const icons = {
+      '해설투어형':'🗺️', '행사마켓형':'🎪', '체험교육형':'🌱', '생태교육형':'🦋', '공연전시형':'🎭'
+    };
+    document.getElementById('modalTitle').textContent = `${icons[p.cat]} ${p.name}`;
+    document.getElementById('modalSub').textContent   = `${p.cat} · No.${num}`;
+    document.getElementById('modalInfo').innerHTML    =
+      `<strong>📍 장소</strong>&nbsp; ${p.place}<br>` +
+      `<strong>📅 운영기간</strong>&nbsp; ${p.period}<br><br>` +
+      `이 프로그램에 참여하신 소감을 알려주세요.<br>설문은 약 3~5분 소요됩니다.`;
+    document.getElementById('surveyBtn').href = surveyUrls[p.cat];
+    document.getElementById('surveyBtn').style.background =
+      `linear-gradient(135deg, ${catColors[p.cat]}, ${catColors[p.cat]}cc)`;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
